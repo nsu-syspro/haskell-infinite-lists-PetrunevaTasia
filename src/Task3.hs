@@ -4,20 +4,16 @@
 
 module Task3 where
 
-import Task2 (Stream (..), fromList, showHelper)
+import Task2 (Stream (..), fromList)
 import Data.Ratio (Ratio)
-import Data.Foldable(toList)
 
 instance Foldable Series where
   foldMap :: Monoid m => (a -> m) -> Series a -> m
-  foldMap f = foldr (\a m -> f a <> m) mempty
-
-  toList :: Series a -> [a]
-  toList (Series a) = toList a 
+  foldMap f (Series a) = foldMap f a
 
 instance Show a => Show (Series a) where
   show :: Show a => Series a -> String
-  show (Series stream) = showHelper 0 stream
+  show = show . coefficients
 
 -- | Power series represented as infinite stream of coefficients
 -- 
@@ -61,7 +57,7 @@ instance (Num a) => Num (Series a) where
     fromInteger n = Series (fromList 0 [fromInteger n])
 
     negate :: Num a => Series a -> Series a
-    negate (Series stream) = Series (fmap (* (-1)) stream)
+    negate = Series . fmap negate . coefficients
 
     (+) :: Num a => Series a -> Series a -> Series a
     (+) (Series a) (Series b) = Series (plusInStreams a b)
@@ -128,7 +124,7 @@ divInStreams (Stream f1 s1) (Stream f2 s2) =
 -- [2,3,0,0,0,0,0,0,0,0]
 --
 gen :: Series (Ratio Integer) -> Stream Integer
-gen (Series stream) = coefficients (Series (fmap round stream))
+gen (Series stream) = fmap round stream
 
 -- | Returns infinite stream of ones
 --

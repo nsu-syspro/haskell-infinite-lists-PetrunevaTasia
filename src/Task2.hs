@@ -17,10 +17,7 @@ showHelper count (Stream a b) = if count >= 10 then ".." else show a++ "," ++ sh
 
 instance Foldable Stream where
   foldMap :: Monoid m => (a -> m) -> Stream a -> m
-  foldMap f = foldr (\x m -> f x <> m) mempty
-
-  toList :: Stream a -> [a]
-  toList (Stream x a) = x : toList a 
+  foldMap f (Stream a b) = f a <> foldMap f b
 
 instance Functor Stream where
   fmap :: (a -> b) -> Stream a -> Stream b
